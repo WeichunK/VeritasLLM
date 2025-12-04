@@ -43,7 +43,7 @@ wandb/
 .idea/
 
 # Project specific
-data/
+/data/
 checkpoints/
 logs/
 stop.signal
