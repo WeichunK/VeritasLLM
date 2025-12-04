@@ -19,7 +19,7 @@ graph TD
     Data[Data Module] --> Trainer
     Model[Model Architecture] --> Trainer
     Trainer --> |Updates| Model
-    Trainer --> |Logs| ExperimentManager[Experiment Manager (WandB/MLflow)]
+    Trainer --> |Logs| ExperimentManager["Experiment Manager (WandB/MLflow)"]
     Trainer --> |Checkpoints| Storage
     Controller[Training Controller] --> |Signals| Trainer
     Observer[Internals Observer] -.-> |Probes| Model
