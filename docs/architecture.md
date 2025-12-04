@@ -2,38 +2,72 @@
 
 ## Overview
 
-VeritasLLM is designed to be **modular** and **hackable**. The core components are decoupled to allow easy experimentation.
+## System Architecture
 
 ```mermaid
-classDiagram
-    class BaseModel {
-        <<interface>>
-        +forward()
-        +generate()
-    }
-    class VeritasModel {
-        +TransformerBlock[] layers
-        +Embedding tok_embeddings
-    }
-    class TransformerBlock {
-        +ConfigurableAttention attention
-        +FeedForward feed_forward
-    }
-    class ConfigurableAttention {
-        +Linear wq, wk, wv, wo
-        +forward()
-    }
-    class MoELayer {
-        +FeedForward[] experts
-        +Linear gate
-        +forward()
-    }
-    
-    BaseModel <|-- VeritasModel
-    VeritasModel *-- TransformerBlock
-    TransformerBlock *-- ConfigurableAttention
-    TransformerBlock *-- MoELayer
+graph TB
+    subgraph Configuration
+        Config[Hydra Config]
+        CLI[Command Line Overrides]
+    end
+
+    subgraph Data_Pipeline
+        RawData[Raw Text/JSON]
+        Tokenizer[TokenizerWrapper]
+        Dataset[InstructionDataset]
+        Loader[DataLoader]
+    end
+
+    subgraph Model_Architecture
+        Embed[Embeddings]
+        Block[TransformerBlock]
+        Attn[ConfigurableAttention]
+        FFN[FeedForward / MoE]
+        Head[Output Head]
+        Observer[InternalsObserver]
+    end
+
+    subgraph Training_Loop
+        Trainer[Trainer]
+        Optim[Optimizer (AdamW)]
+        Loss[Loss Function]
+        Controller[TrainingController]
+    end
+
+    subgraph Experiment_Tracking
+        WandB[WandB Logger]
+        Git[Git Tracker]
+    end
+
+    CLI --> Config
+    Config --> Trainer
+    Config --> Model_Architecture
+    Config --> Data_Pipeline
+
+    RawData --> Tokenizer
+    Tokenizer --> Dataset
+    Dataset --> Loader
+    Loader --> Trainer
+
+    Trainer -->|Forward Pass| Embed
+    Embed --> Block
+    Block --> Attn
+    Block --> FFN
+    FFN --> Block
+    Block --> Head
+    Head --> Loss
+    Loss -->|Backward Pass| Optim
+    Optim -->|Update Weights| Model_Architecture
+
+    Controller -->|Stop Signal| Trainer
+    Observer -.->|Inspect| Block
+    Observer -.->|Inspect| Attn
+
+    Trainer -->|Log Metrics| WandB
+    Trainer -->|Log Config| Git
 ```
+
+## Class Diagram
 
 ## Key Modules
 
