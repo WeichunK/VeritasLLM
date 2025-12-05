@@ -1,0 +1,5 @@
+# Default data configuration
+dataset_name: null
+tokenizer_path: gpt2
+max_seq_len: ${model.max_seq_len}
+num_workers: 4
