@@ -29,6 +29,12 @@ def main(cfg: DictConfig):
     tokenizer_path = cfg.data.get("tokenizer_path", "gpt2")
     tokenizer = TokenizerWrapper(tokenizer_path)
     
+    # Update vocab size based on tokenizer
+    if cfg.model.vocab_size != tokenizer.vocab_size:
+        logger.info(f"Updating vocab_size from {cfg.model.vocab_size} to {tokenizer.vocab_size}")
+        cfg.model.vocab_size = tokenizer.vocab_size
+        # Also ensure padded_vocab_size if using specific kernels, but for now exact match is fine
+    
     # Initialize Dataset
     # Dummy data for demonstration
     dummy_data = [
