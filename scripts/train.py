@@ -1,6 +1,12 @@
 import hydra
 from omegaconf import DictConfig, OmegaConf
 import logging
+import sys
+import os
+
+# Add project root to sys.path
+sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
+
 import torch
 from src.core.config import log_config
 from src.model import VeritasModel
